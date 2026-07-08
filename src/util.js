@@ -1,13 +1,23 @@
 import { spawn } from "node:child_process";
 
-export function run(command, { cwd, timeout = 30_000, env, input, shell = true } = {}) {
+// `command` may be a shell string or an argv array. Argv form spawns without a
+// shell — required whenever an argument embeds untrusted text (model prompts,
+// --help output), which a shell would happily expand (`…` runs commands).
+export function run(command, { cwd, timeout = 30_000, env, input } = {}) {
   return new Promise((resolve) => {
-    const child = spawn(command, {
-      cwd,
-      shell,
-      env: { ...process.env, TERM: "xterm-256color", ...env },
-      stdio: ["pipe", "pipe", "pipe"],
-    });
+    const argvMode = Array.isArray(command);
+    const child = argvMode
+      ? spawn(command[0], command.slice(1), {
+          cwd,
+          env: { ...process.env, TERM: "xterm-256color", ...env },
+          stdio: ["pipe", "pipe", "pipe"],
+        })
+      : spawn(command, {
+          cwd,
+          shell: true,
+          env: { ...process.env, TERM: "xterm-256color", ...env },
+          stdio: ["pipe", "pipe", "pipe"],
+        });
     let stdout = "";
     let stderr = "";
     let timedOut = false;

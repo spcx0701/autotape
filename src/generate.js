@@ -21,10 +21,17 @@ Hard rules:
 - Total visible time under ${Math.max(budget - 4, 8)} seconds. GIFs loop: demo the SINGLE most impressive interaction, not a tour.
 - Start by typing the command (viewers must see what was typed), end with the result on screen followed by \`Sleep 3s\`.
 - After every command's output appears, \`Sleep\` long enough to read it (2s+).
-- Any setup (installs, builds, cd) goes between \`Hide\` and \`Show\`.
+- Any setup (installs, builds) goes between \`Hide\` and \`Show\`.
+- The recording font has no Nerd Font glyphs — avoid icon flags (\`--icons\` etc.); they render as empty boxes.
+- The typed text runs in a real shell — quote multi-word flag values (\`--header 'Pick a file'\`), or the shell splits them into stray arguments.
+- After opening an interactive UI (menus, pagers, TUIs), \`Sleep 2s\` before navigating — viewers need to see the interface before it reacts.
 - The tool is invoked as: ${analysis.cmd}
+- The shell already starts in the working directory whose contents are listed below. Do NOT \`cd\` anywhere. Only reference files/directories from that listing (or ones you create in a Hide block first) — inventing a filename breaks the demo.
 
 Tool name: ${analysis.name}
+
+Files in the working directory:
+${analysis.files?.length ? analysis.files.join("\n") : "(empty)"}
 
 --help output:
 ${analysis.helpText || "(none captured)"}
@@ -63,9 +70,9 @@ export async function generateBody(analysis, { agent = "claude", model = "sonnet
   const prompt = buildPrompt(analysis, { budget, feedback });
   let res;
   if (agent === "claude") {
-    res = await run(`claude -p ${JSON.stringify(prompt)} --model ${model}`, { timeout: 240_000, shell: true });
+    res = await run(["claude", "-p", prompt, "--model", model], { timeout: 240_000 });
   } else if (agent === "codex") {
-    res = await run(`codex exec ${JSON.stringify(prompt)}`, { timeout: 240_000, shell: true });
+    res = await run(["codex", "exec", prompt], { timeout: 240_000 });
   } else {
     throw new Error(`unknown agent driver: ${agent}`);
   }
