@@ -35,9 +35,10 @@ Sleep 3s
 ## Install
 
 ```sh
-brew install vhs          # renderer (pulls ttyd + ffmpeg)
 npm install -g autotape   # or: npx autotape
 ```
+
+`autotape` itself is pure Node — the postinstall step just checks whether `vhs`, `ttyd`, and `ffmpeg` are on your `PATH` and prints the right install command if not (`brew install vhs` covers all three on macOS/Linuxbrew). No binaries are silently downloaded.
 
 The default agent driver shells out to [Claude Code](https://claude.com/claude-code) (`claude -p`). Template mode (`--agent none`) needs no agent at all.
 
