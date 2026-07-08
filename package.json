@@ -1,0 +1,36 @@
+{
+  "name": "autotape",
+  "version": "0.1.0",
+  "description": "Point it at any CLI repo — get a README-ready demo GIF. Agent-written VHS tapes, deterministic rendering, frame-by-frame self-review.",
+  "type": "module",
+  "bin": {
+    "autotape": "bin/autotape.js"
+  },
+  "scripts": {
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "vhs",
+    "gif",
+    "demo",
+    "readme",
+    "cli",
+    "terminal",
+    "agent",
+    "claude"
+  ],
+  "author": "spcx0701",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/spcx0701/autotape.git"
+  },
+  "files": [
+    "bin/",
+    "src/",
+    "data/extracted-defaults.json"
+  ]
+}
