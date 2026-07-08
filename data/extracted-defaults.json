@@ -1,0 +1,35 @@
+{
+  "$comment": "Settings extracted 2026-07-09 from 13 real VHS tapes in public repos (see sources). autotape's profile defaults are derived from these measured values, not taste.",
+  "sources": [
+    "charmbracelet/vhs examples (glow, gum/pager, gh-cli)",
+    "dlvhdr/diffnav",
+    "byawitz/ggh",
+    "blacknon/hwatch",
+    "danvergara/dblab",
+    "Chleba/netscanner",
+    "bakks/butterfish",
+    "raitonoberu/sptlrx",
+    "mrusme/neonmodem",
+    "siddhantac/puffin",
+    "ajayd-san/gomanagedocker"
+  ],
+  "measured": {
+    "fontSize": { "values": [11, 12, 14, 14, 16, 16, 16, 16, 22, 27, 28], "heroCluster": [22, 27, 28], "tuiCluster": [14, 16] },
+    "dimensions": { "compactCluster": ["800x600", "900x520"], "hdCluster": ["1500x640", "1600x800", "1600x1040", "1920x1080", "1920x1200"] },
+    "framerate": { "values": [20, 30, 30, 30, 40], "typical": 30 },
+    "typingSpeedMs": { "values": [90, 100, 100, 100], "outlier": "1000ms used only for single-key TUI emphasis (diffnav)" },
+    "themes": ["Catppuccin Frappe", "Catppuccin Mocha", "Dracula+", "Rose Pine", "Monokai Pro", "Batman", "custom Tokyo Night palette"],
+    "sleepTotalSeconds": { "wellMade": [3.3, 4.5, 8.8, 10.5, 13.6, 14.0, 16.0, 17.0], "verbose": [26.1, 67.0, 67.5] },
+    "polishDetails": {
+      "githubBlend": "ggh: Margin 20 + MarginFill \"#0d1117\" (GitHub dark bg) + BorderRadius 10",
+      "cursorBlink": "butterfish, hwatch: Set CursorBlink false",
+      "hideSetup": "glow advanced: Hide/Show around setup commands",
+      "windowBar": "hwatch: Set WindowBar Colorful"
+    }
+  },
+  "bestPractices": {
+    "maxDurationReadmeSec": 20,
+    "maxDurationPrSec": 10,
+    "note": "GIFs loop — one interaction beats a 45s walkthrough (rekort.app/blog/gif-for-github-readme)"
+  }
+}
