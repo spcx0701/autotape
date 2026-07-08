@@ -34,13 +34,13 @@ export async function review(gifPath, { model = "sonnet", toolName = "the CLI" }
 Frames:
 ${frames.map((f, i) => `${i + 1}. ${f}`).join("\n")}
 
-Reject if you see any of: error messages or stack traces, "command not found", a mostly-blank terminal for several consecutive frames, text cut off by the window edge, or output that never visibly changes (broken demo).
-Accept if the frames show a command being typed and producing sensible, readable output.
+Reject if you see any of: error messages or stack traces, "command not found" / "No such file or directory", a mostly-blank terminal across several consecutive frames, or text cut off by the window edge.
+Accept if the frames show a command being typed and producing sensible, readable output. Identical consecutive frames are FINE when they hold successful output on screen for readability — GIFs pause on results by design; only treat static frames as a failure when the screen shows no meaningful output at all.
 
 Reply with ONLY a JSON object: {"pass": true|false, "issues": ["specific issue", ...]}`;
 
   const res = await run(
-    `claude -p ${JSON.stringify(prompt)} --model ${model} --allowed-tools "Read"`,
+    ["claude", "-p", prompt, "--model", model, "--allowed-tools", "Read"],
     { timeout: 300_000, cwd: dir },
   );
   const verdict = extractJson(res.stdout);

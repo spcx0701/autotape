@@ -30,6 +30,8 @@ Enter
 Sleep 3s
 ```
 
+**More:** the [gallery](./docs/gallery/) — bat, eza, fd, glow, gum, hyperfine, ripgrep, tokei — every GIF one command, zero manual editing, each with its editable tape next to it.
+
 ## Install
 
 ```sh

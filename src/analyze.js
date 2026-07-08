@@ -17,6 +17,35 @@ async function readReadme(repoPath) {
   }
 }
 
+const IGNORED = new Set(["node_modules", ".git", "dist", "build", "target", ".DS_Store"]);
+const FILE_LIMIT = 40;
+
+// Shallow listing (two levels) so the agent scripts against files that exist
+// instead of hallucinating names — the #1 cause of broken first drafts.
+async function listFiles(repoPath) {
+  const out = [];
+  try {
+    const top = await readdir(repoPath, { withFileTypes: true });
+    for (const entry of top) {
+      if (IGNORED.has(entry.name)) continue;
+      if (out.length >= FILE_LIMIT) break;
+      if (entry.isDirectory()) {
+        out.push(`${entry.name}/`);
+        const sub = await readdir(join(repoPath, entry.name)).catch(() => []);
+        for (const name of sub.slice(0, 8)) {
+          if (out.length >= FILE_LIMIT) break;
+          out.push(`${entry.name}/${name}`);
+        }
+      } else {
+        out.push(entry.name);
+      }
+    }
+  } catch {
+    // unreadable dir — the agent just gets no listing
+  }
+  return out;
+}
+
 async function detectCmd(repoPath) {
   try {
     const pkg = JSON.parse(await readFile(join(repoPath, "package.json"), "utf8"));
@@ -49,5 +78,6 @@ export async function analyze({ repoPath = ".", cmd }) {
   }
 
   const name = resolvedCmd.split(/\s+/).find((w) => !w.startsWith("-") && w !== "node") ?? resolvedCmd;
-  return { repoPath, cmd: resolvedCmd, name, readme, helpText };
+  const files = await listFiles(repoPath);
+  return { repoPath, cmd: resolvedCmd, name, readme, helpText, files };
 }
