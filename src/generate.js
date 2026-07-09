@@ -25,6 +25,8 @@ Hard rules:
 - The recording font has no Nerd Font glyphs — avoid icon flags (\`--icons\` etc.); they render as empty boxes.
 - The typed text runs in a real shell — quote multi-word flag values (\`--header 'Pick a file'\`), or the shell splits them into stray arguments.
 - After opening an interactive UI (menus, pagers, TUIs), \`Sleep 2s\` before navigating — viewers need to see the interface before it reacts.
+- The GIF is published — never run commands whose output includes the local username, hostname, or home directory paths (\`ls -l\`-style owner columns, \`whoami\`, \`$HOME\`). Prefer flags that omit them (e.g. \`--no-user\`).
+- If the demo creates files or state (git repos, databases, downloads), remove them in a final \`Hide\` block (\`rm -rf .git demo.db\` etc.) — retakes reuse the same directory and stale state from a previous take ruins the next recording.
 - The tool is invoked as: ${analysis.cmd}
 - The shell already starts in the working directory whose contents are listed below. Do NOT \`cd\` anywhere. Only reference files/directories from that listing (or ones you create in a Hide block first) — inventing a filename breaks the demo.
 

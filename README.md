@@ -2,7 +2,7 @@
 
 **Point autotape at any CLI repo — get a README-ready demo GIF.**
 
-It reads your `--help`, scripts your tool's single best interaction as a [VHS](https://github.com/charmbracelet/vhs) tape, renders it deterministically, then reviews its own GIF frame-by-frame and fixes what looks wrong. You don't get a video you're stuck with — you get an editable `.tape` draft, styled with settings extracted from the best demo GIFs on GitHub.
+It reads your `--help`, scripts your tool's single best interaction as a [VHS](https://github.com/charmbracelet/vhs) tape, renders it deterministically, then reviews its own GIF frame-by-frame and fixes what looks wrong. You don't get a video you're stuck with — you get an editable `.tape` draft you can tweak and re-render.
 
 <p align="center">
   <img src="./docs/demo.gif" alt="autotape demo — autotape recording itself" width="800" />
@@ -74,7 +74,7 @@ The subjective part (what to show) is compressed into a small text artifact you 
 
 ## The taste engine
 
-Nothing here is tuned by eye. Profiles and lint thresholds are measured from 13 real tapes shipped by popular repos (charmbracelet/vhs examples, diffnav, ggh, hwatch, dblab, netscanner, butterfish, sptlrx, neonmodem, puffin, gomanagedocker) — raw tapes in [`data/corpus/`](./data/corpus/), distributions in [`data/extracted-defaults.json`](./data/extracted-defaults.json).
+Nothing here is tuned by eye — profiles and lint thresholds are measured from real, published VHS tapes (distributions in [`data/extracted-defaults.json`](./data/extracted-defaults.json)).
 
 | Measured | Finding | autotape default |
 |---|---|---|
@@ -82,9 +82,9 @@ Nothing here is tuned by eye. Profiles and lint thresholds are measured from 13 
 | Dimensions | 1500×640-ish hero, 1600×900+ TUI | per profile |
 | TypingSpeed | 90–100ms in every polished tape | 100ms |
 | Total sleeps | well-made tapes: 3–17s | ≤20s budget (≤10s `--pr`) |
-| GitHub blend | `Margin 20` + `MarginFill "#0d1117"` + `BorderRadius 10` (ggh) | on for hero |
-| Cursor | `CursorBlink false` (butterfish, hwatch) | on |
-| Setup | wrapped in `Hide`/`Show` (glow) | lint error if visible |
+| GitHub blend | `Margin 20` + `MarginFill "#0d1117"` + `BorderRadius 10` | on for hero |
+| Cursor | `CursorBlink false` | on |
+| Setup | wrapped in `Hide`/`Show` | lint error if visible |
 
 `autotape lint` enforces these on any tape, generated or hand-written. Two rules exist because real tapes broke without them: VHS strings have **no escape sequences** (`\"` is a parse error — autotape re-delimits with backticks), and VHS allows **multiple commands per line** (`Sleep 2s Show`), which the parser handles token-wise.
 

@@ -6,16 +6,20 @@ import { spawn } from "node:child_process";
 export function run(command, { cwd, timeout = 30_000, env, input } = {}) {
   return new Promise((resolve) => {
     const argvMode = Array.isArray(command);
+    // An `undefined` value in `env` deletes the variable for the child —
+    // spreading alone can't unset anything inherited from process.env.
+    const childEnv = { ...process.env, TERM: "xterm-256color", ...env };
+    for (const k of Object.keys(childEnv)) if (childEnv[k] === undefined) delete childEnv[k];
     const child = argvMode
       ? spawn(command[0], command.slice(1), {
           cwd,
-          env: { ...process.env, TERM: "xterm-256color", ...env },
+          env: childEnv,
           stdio: ["pipe", "pipe", "pipe"],
         })
       : spawn(command, {
           cwd,
           shell: true,
-          env: { ...process.env, TERM: "xterm-256color", ...env },
+          env: childEnv,
           stdio: ["pipe", "pipe", "pipe"],
         });
     let stdout = "";

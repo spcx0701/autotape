@@ -1,5 +1,5 @@
-// Profile defaults are measured, not invented — derived from 13 real tapes in
-// popular repos. Distributions and sources: data/extracted-defaults.json.
+// Profile defaults are measured, not invented — derived from real published
+// tapes. Distributions and sources: data/extracted-defaults.json.
 
 export const PROFILES = {
   // Single-interaction "hero" GIF at the top of a README.

@@ -34,7 +34,7 @@ export async function review(gifPath, { model = "sonnet", toolName = "the CLI" }
 Frames:
 ${frames.map((f, i) => `${i + 1}. ${f}`).join("\n")}
 
-Reject if you see any of: error messages or stack traces, "command not found" / "No such file or directory", a mostly-blank terminal across several consecutive frames, or text cut off by the window edge.
+Reject if you see any of: error messages or stack traces, "command not found" / "No such file or directory", a mostly-blank terminal across several consecutive frames, text cut off by the window edge, or leaked personal information (a real username in an ls/eza owner column, a hostname in a prompt, /Users/<name> or /home/<name> paths).
 Accept if the frames show a command being typed and producing sensible, readable output. Identical consecutive frames are FINE when they hold successful output on screen for readability — GIFs pause on results by design; only treat static frames as a failure when the screen shows no meaningful output at all.
 
 Reply with ONLY a JSON object: {"pass": true|false, "issues": ["specific issue", ...]}`;

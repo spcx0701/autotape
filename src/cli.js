@@ -2,6 +2,7 @@ import { parseArgs } from "node:util";
 import { mkdir, writeFile, readFile } from "node:fs/promises";
 import { realpathSync } from "node:fs";
 import { join, resolve, relative } from "node:path";
+import { homedir } from "node:os";
 import { analyze } from "./analyze.js";
 import { generateTape } from "./generate.js";
 import { lint } from "./lint.js";
@@ -27,14 +28,17 @@ ${c.bold("Options:")}
   --shell <shell>      shell for the recording (default: vhs default)
   -h, --help           show this help
 
-${c.dim(`Profiles and lint thresholds are measured from 13 real tapes in popular
-repos — see data/extracted-defaults.json for the distributions and sources.`)}`;
+${c.dim(`Profiles and lint thresholds are measured from real published tapes —
+see data/extracted-defaults.json for the distributions.`)}`;
 
-// Paths shown to the user: relative when inside cwd, absolute otherwise
-// (a ../../../ chain is worse than an absolute path).
+// Paths shown to the user: relative when inside cwd, ~-abbreviated otherwise.
+// Never print the raw home directory — these lines end up inside recorded
+// demos, and the username is nobody's business.
 function disp(p) {
   const rel = relative(process.cwd(), p);
-  return rel.startsWith("..") ? p : rel;
+  if (!rel.startsWith("..")) return rel === "" ? "." : rel;
+  const home = homedir();
+  return p.startsWith(home) ? "~" + p.slice(home.length) : p;
 }
 
 function printFindings(findings) {
@@ -94,7 +98,7 @@ export async function main(argv = process.argv.slice(2)) {
   const gifRel = relative(repoPath, gifPath);
   const tapePath = join(outDir, "demo.tape");
 
-  step(`analyzing ${c.bold(repoPath)}`);
+  step(`analyzing ${c.bold(disp(repoPath))}`);
   const analysis = await analyze({ repoPath, cmd: values.cmd });
   step(`tool: ${c.bold(analysis.name)} ${c.dim(`(${analysis.cmd})`)} — help captured: ${analysis.helpText ? "yes" : "no"}`);
 
@@ -130,6 +134,10 @@ export async function main(argv = process.argv.slice(2)) {
     step("rendering with vhs (deterministic)");
     const { bytes } = await render(tapePath, { cwd: repoPath, outputPath: gifRel });
     step(`rendered ${c.bold(disp(gifPath))} ${c.dim(`(${(bytes / 1024).toFixed(0)} KB)`)}`);
+    // The saved tape is a portable draft: a bare Output filename re-renders
+    // wherever the user runs `vhs demo.tape`, and machine paths
+    // (/Users/<name>/…) never end up in a publishable file.
+    await writeFile(tapePath, tape.replace(/^Output .*$/m, "Output demo.gif"));
 
     if (values["no-review"] || values.agent === "none") {
       await writeSnippet(outDir, analysis.name);

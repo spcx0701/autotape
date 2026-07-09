@@ -1,6 +1,6 @@
 {
   "name": "autotape",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Point it at any CLI repo — get a README-ready demo GIF. Agent-written VHS tapes, deterministic rendering, frame-by-frame self-review.",
   "type": "module",
   "bin": {
