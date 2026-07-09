@@ -53,7 +53,7 @@ autotape lint demo.tape                 # lint any VHS tape against the measured
 | Flag | Meaning | Default |
 |---|---|---|
 | `--cmd "<command>"` | how to invoke the CLI | auto-detected |
-| `--profile hero\|tui` | single-command hero shot vs full-screen TUI | `hero` |
+| `--profile hero\|tui` | single-command hero shot vs full-screen TUI | auto-detected |
 | `--agent claude\|codex\|none` | who writes the tape body | `claude` |
 | `--try "<command>"` | example invocation for `--agent none` | — |
 | `--pr` | 10s budget (PR comment) instead of 20s (README) | off |
@@ -64,13 +64,15 @@ Outputs: `demo.gif`, `demo.tape` (editable draft), `README-snippet.md`, `review.
 
 ## How it works
 
-1. **Analyze** — reads your README and `--help` output.
-2. **Write** — an agent scripts the *single most impressive interaction* as a tape body. Settings come from the profile, not the model.
+1. **Analyze** — reads your README and `--help` output, and decides whether the tool is a one-shot command or a full-screen **TUI** (from framework mentions and a keybindings table). A TUI switches to the `tui` profile and its keybindings are pulled out for the next step.
+2. **Write** — an agent scripts the *single most impressive interaction* as a tape body: one command-and-output for a CLI, or a launch-then-navigate walkthrough driven by the extracted keys for a TUI. Settings come from the profile, not the model.
 3. **Lint** — deterministic rules check (and auto-fix) the draft before a single frame is rendered.
 4. **Render** — VHS records the tape. Same tape in, same GIF out, every time.
-5. **Review** — frames are extracted with ffmpeg and read back by a vision model: error text, blank frames, cut-off output, or a broken demo send the tape back to step 2 with specific feedback.
+5. **Review** — frames are extracted with ffmpeg and read back by a vision model: error text, blank frames, cut-off output, leaked usernames, or a broken demo send the tape back to step 2 with specific feedback.
 
 The subjective part (what to show) is compressed into a small text artifact you can edit; everything after it is deterministic. Cost per run: two small model calls.
+
+Both shapes are in the [gallery](./docs/gallery/) — eight one-shot CLIs plus an [htop TUI walkthrough](./docs/gallery/htop/demo.tape).
 
 ## The taste engine
 

@@ -38,6 +38,24 @@ export const RULES = [
     },
   },
   {
+    // VHS has no function keys (F1–F12) and rejects unknown tokens with a parse
+    // error at render time. Catching it here turns a hard render failure into
+    // review feedback the agent can act on (common when a TUI's keybindings
+    // table lists F-keys). No auto-fix: only the agent knows the right key.
+    id: "invalid-command",
+    severity: "error",
+    check(p) {
+      const bad = p.commands.find(
+        (c) => c.type === "unknown" && !c.hidden && /^(F\d{1,2}|[A-Z][A-Za-z]{2,})$/.test(c.name),
+      );
+      if (!bad) return null;
+      return {
+        line: bad.n,
+        message: `line ${bad.n}: \`${bad.name}\` is not a valid VHS key — no function keys (F1–F12); use a letter-key alternative, or arrows / Enter / Tab / Escape / Ctrl+ / Alt+ combos`,
+      };
+    },
+  },
+  {
     id: "has-output",
     severity: "error",
     check(p) {

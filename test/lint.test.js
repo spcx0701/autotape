@@ -47,6 +47,18 @@ test("visible setup command is an error; hidden setup passes", () => {
   assert.equal(lint(hidden, { budget: 20 }).findings.filter((f) => f.rule === "hide-setup").length, 0);
 });
 
+test("function key in a TUI tape is a lint error", () => {
+  const tape = heroHeader + `\nType "htop"\nEnter\nSleep 2s\nF6\nSleep 3s\n`;
+  const { findings } = lint(tape, { profile: "tui", budget: 20 });
+  assert.ok(findings.some((f) => f.rule === "invalid-command" && f.severity === "error"));
+});
+
+test("valid TUI navigation keys do not trip invalid-command", () => {
+  const tape = heroHeader + `\nType "htop"\nEnter\nSleep 2s\nDown@400ms 3\nTab\nEscape\nSleep 3s\n`;
+  const { findings } = lint(tape, { profile: "tui", budget: 20 });
+  assert.equal(findings.filter((f) => f.rule === "invalid-command").length, 0);
+});
+
 test("bare tape is auto-fixed into a passing state (minus duration/content rules)", () => {
   const bare = `Output demo.gif\nSet FontSize 26\nSet Width 1500\nSet Height 640\nType "greet hello"\nEnter\nSleep 2s\n`;
   const fixed = fix(bare, { profile: "hero", budget: 20 });

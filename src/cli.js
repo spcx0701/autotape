@@ -18,7 +18,7 @@ ${c.bold("Usage:")}
 
 ${c.bold("Options:")}
   --cmd "<command>"    how to invoke the CLI (auto-detected from package.json bin)
-  --profile <p>        hero | tui                       (default: hero)
+  --profile <p>        hero | tui              (default: auto-detected from the tool)
   --agent <a>          claude | codex | none            (default: claude)
   --model <m>          model for generation/review      (default: sonnet)
   --try "<command>"    example invocation, used by --agent none
@@ -54,7 +54,7 @@ export async function main(argv = process.argv.slice(2)) {
     allowPositionals: true,
     options: {
       cmd: { type: "string" },
-      profile: { type: "string", default: "hero" },
+      profile: { type: "string" },
       agent: { type: "string", default: "claude" },
       model: { type: "string", default: "sonnet" },
       try: { type: "string" },
@@ -78,7 +78,7 @@ export async function main(argv = process.argv.slice(2)) {
     const file = positionals[1];
     if (!file) throw new Error("usage: autotape lint <file.tape>");
     const text = await readFile(file, "utf8");
-    const { findings, durationSec } = lint(text, { profile: values.profile, budget });
+    const { findings, durationSec } = lint(text, { profile: values.profile ?? "hero", budget });
     console.log(`${c.bold(file)} — estimated visible duration ${durationSec.toFixed(1)}s (budget ${budget}s)`);
     if (findings.length === 0) {
       console.log(c.green("✓ clean"));
@@ -102,13 +102,19 @@ export async function main(argv = process.argv.slice(2)) {
   const analysis = await analyze({ repoPath, cmd: values.cmd });
   step(`tool: ${c.bold(analysis.name)} ${c.dim(`(${analysis.cmd})`)} — help captured: ${analysis.helpText ? "yes" : "no"}`);
 
+  // Profile follows the detected kind unless the user pinned one. A TUI scripted
+  // with the hero profile (tiny window, one-shot framing) makes a bad demo.
+  const profile = values.profile ?? (analysis.kind === "tui" ? "tui" : "hero");
+  const detail = analysis.kind === "tui" ? `${analysis.keybindings.length} keybinding hint(s)` : "one-shot command";
+  step(`kind: ${c.bold(analysis.kind)} ${c.dim(`(${detail})`)} → profile ${c.bold(profile)}${values.profile ? c.dim(" (forced)") : ""}`);
+
   let feedback;
   const maxAttempts = values.agent === "none" || values["no-review"] ? 1 : 2;
 
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-    step(`writing tape ${c.dim(`(agent: ${values.agent}, profile: ${values.profile}, attempt ${attempt}/${maxAttempts})`)}`);
+    step(`writing tape ${c.dim(`(agent: ${values.agent}, profile: ${profile}, attempt ${attempt}/${maxAttempts})`)}`);
     const { tape, report } = await generateTape(analysis, {
-      profile: values.profile,
+      profile,
       agent: values.agent,
       model: values.model,
       budget,
@@ -146,7 +152,7 @@ export async function main(argv = process.argv.slice(2)) {
     }
 
     step("self-review: reading the GIF frame by frame");
-    const verdict = await review(gifPath, { model: values.model, toolName: analysis.name });
+    const verdict = await review(gifPath, { model: values.model, toolName: analysis.name, kind: analysis.kind });
     if (verdict.pass === true) {
       await writeFile(join(outDir, "review.json"), JSON.stringify(verdict, null, 2));
       await writeSnippet(outDir, analysis.name);
